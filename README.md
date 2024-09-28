@@ -58,7 +58,7 @@ where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and
 -> Single-row covering index lookup on i using PRIMARY (inventory_id=r.inventory_id)  (cost=250e-6 rows=1) (actual time=346e-6..418e-6 rows=1 loops=642000)
 ```
 
-**Узкие места:**
+**Выявленные возможные узкие места:**
 **Функция DATE(p.payment_date):** Использование функции DATE на колонке payment_date препятствует использованию индексов, что приводит к полному сканированию таблицы payment.
 
 **Nested Loop Joins:** Несколько вложенных циклов (Nested Loop Joins) могут быть очень дорогими, особенно если одна из таблиц значительно больше другой.
@@ -67,11 +67,7 @@ where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and
 
 **Временные таблицы и сортировка:** Создание временных таблиц и последующая сортировка данных также увеличивают время выполнения.
 
-
-
-
-
-**Для оптимизации на мой взгляд можно выполнить следующее:**
+**Для оптимизации запроса, на мой взгляд, можно выполнить следующее:**
 
 **Добавим индексы:**
 ```
@@ -100,6 +96,7 @@ WHERE
 ```
 <img src = "img/04.png" width = 100%>
 
+**Запрос вернул:**
 ```
 -> Table scan on <temporary>  (cost=2.5..2.5 rows=0) (actual time=24..24.1 rows=602 loops=1)
 -> Temporary table with deduplication  (cost=0..0 rows=0) (actual time=24..24 rows=602 loops=1)
@@ -118,21 +115,4 @@ WHERE
 -> Single-row index lookup on f using PRIMARY (film_id=i.film_id)  (cost=0.24 rows=1) (actual time=0.00253..0.00258 rows=1 loops=642)
 ```
 
-
-
-
-
-
-
-
-
-
----
-## Задание 3
-Самостоятельно изучите, какие типы индексов используются в PostgreSQL. Перечислите те индексы, которые используются в PostgreSQL, а в MySQL — нет.
-
-Приведите ответ в свободной форме.
-
-### Ответ:
-
-
+Из результата видно, что показатели изменились в лучшую сторону и запрос начал выполнять быстрее.
